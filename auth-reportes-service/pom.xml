@@ -79,6 +79,18 @@
     </build>
     <profiles>
         <profile>
+            <id>auth-sql-integration</id>
+            <build><plugins><plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <includes><include>**/AuthSqlIT.java</include></includes>
+                    <failIfNoTests>true</failIfNoTests>
+                </configuration>
+                <executions><execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution></executions>
+            </plugin></plugins></build>
+        </profile>
+        <profile>
             <id>db-migration</id>
             <build>
                 <plugins>

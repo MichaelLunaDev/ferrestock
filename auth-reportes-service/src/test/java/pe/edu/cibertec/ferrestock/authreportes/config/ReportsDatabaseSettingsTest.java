@@ -4,10 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.mock.env.MockEnvironment;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.junit.jupiter.api.io.TempDir;
+import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.*;
 
 class ReportsDatabaseSettingsTest {
+    @TempDir Path temp;
     @Test void runtimeStillHasPendingReaderAndNoCommercialDataSource(){
         new org.springframework.boot.test.context.runner.ApplicationContextRunner()
             .withUserConfiguration(ReportConfig.class)
@@ -23,10 +25,15 @@ class ReportsDatabaseSettingsTest {
     MockEnvironment env(){var env=new MockEnvironment();env.setActiveProfiles("auth-db");return env
         .withProperty("REPORTS_DB_URL","jdbc:sqlserver://127.0.0.1:14333;databaseName=ferrestock_ventas;encrypt=true;trustServerCertificate=false")
         .withProperty("REPORTS_DB_USER","ferrestock_report_reader").withProperty("REPORTS_DB_PASSWORD","SECRET_CANARY");}
-    @Test void preparedSourceIsIndependentAndNeverOpened(){
-        var settings=ReportsDatabaseSettings.from(env());assertThat(settings.toString()).doesNotContain("SECRET_CANARY","jdbc:");
-        var ds=(DriverManagerDataSource)settings.prepareDataSource();assertThat(ds.getUsername()).isEqualTo("ferrestock_report_reader");
-        assertThat(ds.getUrl()).endsWith(";trustServerCertificate=false;loginTimeout=10");
+    @Test void preparedSourceIsIndependentAndNeverOpened() throws Exception {
+        var settings=ReportsDatabaseSettings.from(TlsFixtures.tls(env(),TlsFixtures.store(temp)));
+        assertThat(settings.toString()).doesNotContain("SECRET_CANARY","jdbc:");
+        try(var driver=new TlsFixtures.CaptureDriver()) {
+            var ds=settings.prepareDataSource();assertThat(driver.urls).isEmpty();
+            try(var ignored=ds.getConnection()) { }
+            assertThat(driver.properties.getFirst().getProperty("user")).isEqualTo("ferrestock_report_reader");
+            assertThat(driver.urls.getFirst()).endsWith(";trustServerCertificate=false;loginTimeout=10");
+        }
     }
     @ParameterizedTest @ValueSource(strings={"sa","ferrestock_auth_app","ferrestock_auth_migrator","ferrestock_auth_test_app"})
     void forbiddenIdentity(String user){assertThatThrownBy(() -> ReportsDatabaseSettings.from(env().withProperty("REPORTS_DB_USER",user))).hasNoCause().hasMessage("Configuracion SQL Reportes no autorizada o incompleta");}
