@@ -131,7 +131,8 @@ class AuthSqlIT {
             sessions.insert(new Sesion(null, id, hash, 1, now, now.plusSeconds(300), null, null));
             var user = users.findByIdForUpdate(id).orElseThrow();
             assertThat(sessions.findActiveByHash(hash)).isPresent();
-            var updated = new Usuario(id, user.login(), user.nombre(), user.passwordHash(), EstadoUsuario.INACTIVO,
+            // Keep ACTIVO: otherwise deactivation could conceal a broken version predicate.
+            var updated = new Usuario(id, user.login(), user.nombre(), user.passwordHash(), EstadoUsuario.ACTIVO,
                     user.rol(), 2, user.creadoEn(), user.actualizadoEn(), null, id);
             assertThat(users.updateSecurity(updated, 1)).isTrue();
             assertThat(sessions.findActiveByHash(hash)).isEmpty();
