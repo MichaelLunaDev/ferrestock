@@ -1,0 +1,9 @@
+# Estas propuestas, manifiestos y migraciones fijan SHA256 de bytes exactos.
+# Conservar sus EOL originales incluso con core.autocrlf=true en Windows.
+db/** -text whitespace=cr-at-eol
+docs/** -text whitespace=cr-at-eol
+src/main/resources/db/migration/** -text whitespace=cr-at-eol
+
+# Un diff unificado representa contexto vacío con un espacio inicial obligatorio.
+# No recortar esos espacios ni alterar los parches históricos para diff --check.
+db/proposals/**/patches/*.patch whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof

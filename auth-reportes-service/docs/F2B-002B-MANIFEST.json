@@ -1,0 +1,644 @@
+{
+    "status":  "PROPUESTO_NO_AUTORIZADO",
+    "variant":  "migrador_compartido",
+    "baseline_acl_count":  34,
+    "final_acl_count":  57,
+    "objects":  [
+                    {
+                        "database":  "ferrestock_auth_dev",
+                        "schema":  "auth",
+                        "name":  "rol",
+                        "type":  "U",
+                        "effective_owner":  "auth_owner",
+                        "explicit_object_owner":  null
+                    },
+                    {
+                        "database":  "ferrestock_auth_dev",
+                        "schema":  "auth",
+                        "name":  "usuario",
+                        "type":  "U",
+                        "effective_owner":  "auth_owner",
+                        "explicit_object_owner":  null
+                    },
+                    {
+                        "database":  "ferrestock_auth_dev",
+                        "schema":  "auth",
+                        "name":  "sesion",
+                        "type":  "U",
+                        "effective_owner":  "auth_owner",
+                        "explicit_object_owner":  null
+                    },
+                    {
+                        "database":  "ferrestock_auth_dev",
+                        "schema":  "auth",
+                        "name":  "flyway_schema_history",
+                        "type":  "U",
+                        "effective_owner":  "auth_owner",
+                        "explicit_object_owner":  null
+                    },
+                    {
+                        "database":  "ferrestock_auth_test",
+                        "schema":  "auth",
+                        "name":  "rol",
+                        "type":  "U",
+                        "effective_owner":  "auth_owner",
+                        "explicit_object_owner":  null
+                    },
+                    {
+                        "database":  "ferrestock_auth_test",
+                        "schema":  "auth",
+                        "name":  "usuario",
+                        "type":  "U",
+                        "effective_owner":  "auth_owner",
+                        "explicit_object_owner":  null
+                    },
+                    {
+                        "database":  "ferrestock_auth_test",
+                        "schema":  "auth",
+                        "name":  "sesion",
+                        "type":  "U",
+                        "effective_owner":  "auth_owner",
+                        "explicit_object_owner":  null
+                    },
+                    {
+                        "database":  "ferrestock_auth_test",
+                        "schema":  "auth",
+                        "name":  "flyway_schema_history",
+                        "type":  "U",
+                        "effective_owner":  "auth_owner",
+                        "explicit_object_owner":  null
+                    }
+                ],
+    "database_acl":  [
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "auth_owner",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CONNECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CONNECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE TABLE",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE VIEW",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE PROCEDURE",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE FUNCTION",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "ALTER ANY SCHEMA",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CONNECT",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CONNECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE TABLE",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "ALTER",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "REFERENCES",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "SELECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "INSERT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "UPDATE",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "DELETE",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "VIEW DEFINITION",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "auth_owner",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CONNECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CONNECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE TABLE",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE VIEW",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE PROCEDURE",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE FUNCTION",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "ALTER ANY SCHEMA",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_ventas",
+                             "principal":  "ferrestock_report_reader",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CONNECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_ventas",
+                             "principal":  "ferrestock_report_reader",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE TABLE",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_ventas",
+                             "principal":  "ferrestock_report_reader",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE VIEW",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_ventas",
+                             "principal":  "ferrestock_report_reader",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE PROCEDURE",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_ventas",
+                             "principal":  "ferrestock_report_reader",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE FUNCTION",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_ventas",
+                             "principal":  "ferrestock_report_reader",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "ALTER ANY SCHEMA",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_ventas",
+                             "principal":  "ferrestock_report_reader",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "INSERT",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_ventas",
+                             "principal":  "ferrestock_report_reader",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "UPDATE",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_ventas",
+                             "principal":  "ferrestock_report_reader",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "DELETE",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_ventas",
+                             "principal":  "ferrestock_report_reader",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "EXECUTE",
+                             "state":  "D",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CONNECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  0,
+                             "schema":  "",
+                             "object":  "",
+                             "permission":  "CREATE TABLE",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "ALTER",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "REFERENCES",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "SELECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "INSERT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "UPDATE",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "DELETE",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  3,
+                             "schema":  "auth",
+                             "object":  "",
+                             "permission":  "VIEW DEFINITION",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "rol",
+                             "permission":  "SELECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "usuario",
+                             "permission":  "SELECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "usuario",
+                             "permission":  "INSERT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "usuario",
+                             "permission":  "UPDATE",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "sesion",
+                             "permission":  "SELECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "sesion",
+                             "permission":  "INSERT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "sesion",
+                             "permission":  "UPDATE",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "rol",
+                             "permission":  "SELECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "usuario",
+                             "permission":  "SELECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "usuario",
+                             "permission":  "INSERT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "usuario",
+                             "permission":  "UPDATE",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "sesion",
+                             "permission":  "SELECT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "sesion",
+                             "permission":  "INSERT",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_test_app",
+                             "class":  1,
+                             "schema":  "auth",
+                             "object":  "sesion",
+                             "permission":  "UPDATE",
+                             "state":  "G",
+                             "minor_id":  0
+                         }
+                     ]
+}

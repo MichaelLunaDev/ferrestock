@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: auth-reportes-service
+  config:
+    import: optional:file:.env[.properties]
+  sql:
+    init:
+      mode: never
+
+logging:
+  level:
+    # El resolver puede imprimir rejectedValue/password y causas incluso con Advice saneado.
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: 'OFF'
+    org.springframework.jdbc.core: 'OFF'
+    org.springframework.jdbc.support: 'OFF'
+    org.springframework.jdbc.core.StatementCreatorUtils: 'OFF'
+
+server:
+  port: ${PORT:8081}
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never

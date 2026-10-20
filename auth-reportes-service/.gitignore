@@ -1,0 +1,32 @@
+target/
+.env
+.env.*
+!.env.example
+*.log
+*.tmp
+*.class
+*.jks
+*.keystore
+*.truststore
+*.p12
+*.pfx
+*.key
+*.pem
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# Cachés generadas por herramientas offline.
+__pycache__/
+*.py[cod]
+
+# Resultados administrativos locales: conservar fuera de publicaciones Git.
+/db/provisioning/evidence/
+
+# Documentacion y propuestas conservadas solo en el entorno local.
+/docs/*
+!/docs/F2B-002B-MANIFEST.json
+/db/proposals/
