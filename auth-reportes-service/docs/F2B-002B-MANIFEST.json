@@ -2,7 +2,7 @@
     "status":  "PROPUESTO_NO_AUTORIZADO",
     "variant":  "migrador_compartido",
     "baseline_acl_count":  34,
-    "final_acl_count":  57,
+    "final_acl_count":  59,
     "objects":  [
                     {
                         "database":  "ferrestock_auth_dev",
@@ -639,6 +639,41 @@
                              "permission":  "UPDATE",
                              "state":  "G",
                              "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_test",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  4,
+                             "schema":  "",
+                             "object":  "auth_owner",
+                             "permission":  "VIEW DEFINITION",
+                             "state":  "G",
+                             "minor_id":  0
+                         },
+                         {
+                             "database":  "ferrestock_auth_dev",
+                             "principal":  "ferrestock_auth_migrator",
+                             "class":  4,
+                             "schema":  "",
+                             "object":  "auth_owner",
+                             "permission":  "VIEW DEFINITION",
+                             "state":  "G",
+                             "minor_id":  0
                          }
-                     ]
+                     ],
+    "revision":  "ENTREGA-08C",
+    "stage_acl_counts":  {
+                             "current":  43,
+                             "test_owner_visibility":  44,
+                             "test_runtime":  51,
+                             "dev_owner_visibility":  52,
+                             "dev_runtime":  59
+                         },
+    "approval_policy":  "Cada permiso de visibilidad requiere autorizacion local independiente; Dev es condicional, no se concede por simetria.",
+    "document_semantics": "Plan de politica; PROPUESTO_NO_AUTORIZADO no representa ni reemplaza aprobaciones operativas. Las filas Dev son condicionales hasta aprobacion independiente.",
+    "execution_evidence_reference": {
+        "record": "FERRESTOCK-ENTREGA-08-RESULTADO.md, secciones ENTREGA-08C y CIERRE FUNCIONAL",
+        "availability": "Registro operativo privado del equipo, excluido del repositorio publico; conservar junto con autorizaciones locales y comprobaciones posteriores.",
+        "verification": "La matriz 59/59 fue comprobada por etapa. Esta referencia no concede permisos ni convierte el plan en una autorizacion retroactiva."
+    }
 }

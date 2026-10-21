@@ -9,6 +9,13 @@ import static org.assertj.core.api.Assertions.*;
 
 /** Proceso separado con pipes: aborta antes de crear contexto o conectar SQL. */
 class BootstrapGuardTest {
+    @org.junit.jupiter.api.Test void diagnosticsUseOnlyClosedPhasesAndNoExceptionText(){
+        for(var phase:FirstAdministrator.Phase.values()) {
+            assertThat(FirstAdministrator.failure(phase))
+                .isEqualTo("{\"Result\":\"BLOCKED\",\"Phase\":\""+phase.name()+"\",\"Category\":\"BOOTSTRAP_REJECTED\"}")
+                .doesNotContain("jdbc:","password=","Exception");
+        }
+    }
     @ParameterizedTest @ValueSource(strings={"","unexpected"})
     void missingConsoleOrArgumentsRejectBeforeOpeningApplication(String argument)throws Exception{
         String javaBinary=System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("windows")?"java.exe":"java";

@@ -10,22 +10,28 @@ import static pe.edu.cibertec.ferrestock.authreportes.config.MigrationPolicy.*;
 final class MigrationIdentity {
     // Names are compared in Java (exact Unicode/length); SID equality stays binary in SQL.
     static void verify(Connection connection, Target target) throws SQLException {
+        verify(connection, target, false);
+    }
+    static void verify(Connection connection, Target target, boolean ownerVisibilityApproved) throws SQLException {
         if (!connection.getAutoCommit()) throw blocked("TRANSACCION_ENTRADA");
+        int ownerPrincipalId;
         try (var command = connection.createStatement()) {
             command.setQueryTimeout(10);
             try (var row = command.executeQuery("""
+                    DECLARE @EntryTranCount int = @@TRANCOUNT;
+                    DECLARE @EntryXactState int = XACT_STATE();
                     SELECT DB_NAME(), ORIGINAL_LOGIN(), SUSER_SNAME(), USER_NAME(),
                       p.type, p.authentication_type, p.default_schema_name,
                       CASE WHEN p.sid = SUSER_SID() THEN 1 ELSE 0 END,
                       owner.name, owner.type, owner.authentication_type,
-                      @@TRANCOUNT, XACT_STATE(), IS_SRVROLEMEMBER('sysadmin'),
+                      @EntryTranCount, @EntryXactState, IS_SRVROLEMEMBER('sysadmin'),
                       (SELECT COUNT(*) FROM sys.database_role_members WHERE member_principal_id=USER_ID()),
                       (SELECT COUNT(*) FROM sys.schemas WHERE principal_id=USER_ID()),
                       HAS_PERMS_BY_NAME(DB_NAME(),'DATABASE','CONTROL'),
-                      HAS_PERMS_BY_NAME(NULL,'SERVER','CONTROL SERVER'),
+                      HAS_PERMS_BY_NAME(NULL,NULL,'CONTROL SERVER'),
                       HAS_PERMS_BY_NAME(DB_NAME(),'DATABASE','ALTER ANY USER'),
                       HAS_PERMS_BY_NAME(DB_NAME(),'DATABASE','ALTER ANY ROLE'),
-                      HAS_PERMS_BY_NAME(DB_NAME(),'DATABASE','CREATE SCHEMA')
+                      HAS_PERMS_BY_NAME(DB_NAME(),'DATABASE','CREATE SCHEMA'),owner.principal_id
                     FROM sys.database_principals p
                     JOIN sys.schemas s ON s.name=N'auth' COLLATE Latin1_General_100_BIN2
                       AND DATALENGTH(s.name)=8
@@ -40,26 +46,35 @@ final class MigrationIdentity {
                         || !"auth_owner".equals(row.getString(9)) || !"S".equals(row.getString(10))
                         || number(row, 11) != 0) throw blocked("IDENTIDAD");
                 for (int index = 12; index <= 21; index++) if (number(row, index) != 0) throw blocked("PRIVILEGIOS");
+                ownerPrincipalId = number(row, 22);
+                if (ownerPrincipalId <= 0) throw blocked("IDENTIDAD");
                 if (row.next()) throw blocked("IDENTIDAD");
             }
             Set<String> actual = new HashSet<>();
             int count = 0;
             try (var rows = command.executeQuery("""
                     SELECT dp.class, dp.major_id, dp.minor_id, dp.permission_name, dp.state,
-                      CASE WHEN dp.class=3 THEN SCHEMA_NAME(dp.major_id) ELSE N'' END
+                      CASE WHEN dp.class=3 THEN SCHEMA_NAME(dp.major_id)
+                           WHEN dp.class=4 THEN USER_NAME(dp.major_id) ELSE N'' END
                     FROM sys.database_permissions dp WHERE dp.grantee_principal_id=USER_ID()
                     """)) {
                 while (rows.next()) {
                     count++;
                     int scope = number(rows, 1);
                     if (number(rows, 3) != 0 || !"G".equals(rows.getString(5))
+                            || (scope != 0 && scope != 3 && scope != 4)
                             || (scope == 0 && number(rows, 2) != 0)
-                            || (scope == 3 && !"auth".equals(rows.getString(6)))) throw blocked("ACL");
+                            || (scope == 3 && !"auth".equals(rows.getString(6)))
+                            || (scope == 4 && (!ownerVisibilityApproved || number(rows, 2) != ownerPrincipalId
+                                || !"auth_owner".equals(rows.getString(6))
+                                || !"VIEW DEFINITION".equals(rows.getString(4))))) throw blocked("ACL");
                     actual.add(scope + ":" + rows.getString(4));
                 }
             }
-            if (count != 9 || !actual.equals(Set.of("0:CONNECT", "0:CREATE TABLE", "3:ALTER",
-                    "3:REFERENCES", "3:SELECT", "3:INSERT", "3:UPDATE", "3:DELETE", "3:VIEW DEFINITION"))) throw blocked("ACL");
+            Set<String> expected = new HashSet<>(Set.of("0:CONNECT", "0:CREATE TABLE", "3:ALTER",
+                    "3:REFERENCES", "3:SELECT", "3:INSERT", "3:UPDATE", "3:DELETE", "3:VIEW DEFINITION"));
+            if (ownerVisibilityApproved) expected.add("4:VIEW DEFINITION");
+            if (count != expected.size() || !actual.equals(expected)) throw blocked("ACL");
         }
     }
     static Set<String> objects(Connection connection) throws SQLException {

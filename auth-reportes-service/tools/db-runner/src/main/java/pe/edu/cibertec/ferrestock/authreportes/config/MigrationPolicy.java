@@ -25,7 +25,7 @@ final class MigrationPolicy {
         String url() { return "jdbc:sqlserver://127.0.0.1:14333;databaseName=" + database
                 + ";encrypt=true;trustServerCertificate=false;applicationName=FerreStockMigration;enlist=false"; }
     }
-    record Request(Target target, Action action, String approvedState) {
+    record Request(Target target, Action action, String approvedState, boolean ownerVisibilityApproved) {
         static Request parse(String[] args, Map<String, String> env) {
             try {
                 if (args.length < 2 || args.length > 3) throw blocked("ARGUMENTOS");
@@ -38,7 +38,9 @@ final class MigrationPolicy {
                 String state = args.length == 3 ? args[2] : "";
                 if (action == Action.migrate && !state.equals(target.approvedState)) throw blocked("APROBACION_ESTADO");
                 if (action != Action.migrate && args.length != 2) throw blocked("ARGUMENTOS");
-                return new Request(target, action, state);
+                String visibility = env.get("AUTH_MIGRATION_OWNER_VISIBILITY");
+                if (visibility != null && !target.name().equals(visibility)) throw blocked("APROBACION_VISIBILIDAD");
+                return new Request(target, action, state, visibility != null);
             } catch (IllegalArgumentException ex) { throw blocked("ARGUMENTOS"); }
         }
     }

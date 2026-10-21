@@ -38,7 +38,7 @@ public final class MigrationRunner {
                 if (secret == null || secret.length == 0) throw blocked("CREDENCIAL_AUSENTE");
                 DataSource dataSource;
                 try {
-                    dataSource = guarded(new StrictSqlDataSource(request.target().url(), LOGIN, new String(secret), tls), request.target());
+                    dataSource = guarded(new StrictSqlDataSource(request.target().url(), LOGIN, new String(secret), tls), request.target(), request.ownerVisibilityApproved());
                 } finally { Arrays.fill(secret, '\0'); }
                 phase = "Precondiciones";
                 var flyway = configuration(dataSource, snapshot.directory).load();
@@ -55,6 +55,9 @@ public final class MigrationRunner {
     }
     static String failure(String phase, Exception ex) {
         String code = ex instanceof Blocked blocked ? blocked.code : "OPERACION_RECHAZADA";
+        for (Throwable cursor = ex; cursor != null; cursor = cursor.getCause()) {
+            if (cursor instanceof GuardFailure guard) { code = guard.code; break; }
+        }
         // Only codes created by this package; never driver messages, causes, SQL or credentials.
         return "{\"Result\":\"BLOCKED\",\"Phase\":\"" + phase + "\",\"Category\":\"" + code + "\"}";
     }
@@ -68,12 +71,20 @@ public final class MigrationRunner {
                 .javaMigrations(new org.flywaydb.core.api.migration.JavaMigration[0]).loggers("slf4j");
     }
     static DataSource guarded(DataSource source, Target target) {
+        return guarded(source, target, false);
+    }
+    static final class GuardFailure extends SQLException {
+        final String code;
+        GuardFailure(String code) { super("Precondicion SQL rechazada", "08001"); this.code = code; }
+    }
+    static DataSource guarded(DataSource source, Target target, boolean ownerVisibilityApproved) {
         return new AbstractDataSource() {
             @Override public Connection getConnection() throws SQLException {
                 Connection connection = source.getConnection();
-                try { MigrationIdentity.verify(connection, target); return connection; }
+                try { MigrationIdentity.verify(connection, target, ownerVisibilityApproved); return connection; }
                 catch (SQLException | RuntimeException ex) {
                     try { connection.close(); } catch (SQLException ignored) { }
+                    if (ex instanceof Blocked blocked) throw new GuardFailure(blocked.code);
                     throw new SQLException("Precondicion SQL rechazada", "08001");
                 }
             }

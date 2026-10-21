@@ -162,6 +162,58 @@ class MigrationRunnerTest {
     @Test void identitySidOwnerAndExactAclAcceptedWithDoubles() throws Exception {
         MigrationIdentity.verify(connection(Map.of(), false), Target.AuthTest);
     }
+    @Test void exactOwnerAclAcceptedInApprovedTargetPhase() throws Exception {
+        MigrationIdentity.verify(connection(Map.of(), false, false, true), Target.AuthTest, true);
+        assertThat(Request.parse(new String[]{"AuthTest","info"},
+                Map.of("AUTH_MIGRATION_OWNER_VISIBILITY","AuthTest")).ownerVisibilityApproved()).isTrue();
+    }
+    @Test void ownerAclRejectedOutsideApprovedPhase() throws Exception {
+        assertThatThrownBy(() -> MigrationIdentity.verify(connection(Map.of(),false,false,true),Target.AuthTest))
+                .isInstanceOf(Blocked.class);
+    }
+    @Test void approvedPhaseRequiresOwnerAclAndRejectsOtherPrincipalOrExtraPermission() throws Exception {
+        assertThatThrownBy(() -> MigrationIdentity.verify(connection(Map.of(),false),Target.AuthTest,true)).isInstanceOf(Blocked.class);
+        assertThatThrownBy(() -> MigrationIdentity.verify(connection(Map.of(22,6),false,false,true),Target.AuthTest,true)).isInstanceOf(Blocked.class);
+        assertThatThrownBy(() -> MigrationIdentity.verify(connection(Map.of(),true,false,true),Target.AuthTest,true)).isInstanceOf(Blocked.class);
+    }
+    @ParameterizedTest @ValueSource(strings={"AuthDev","AuthTest ","ALL",""})
+    void testApprovalNeverAuthorizesDevOrOtherVisibilityPhase(String phase) {
+        assertThatThrownBy(() -> Request.parse(new String[]{"AuthTest","info"},
+                Map.of("AUTH_MIGRATION_OWNER_VISIBILITY",phase))).isInstanceOf(Blocked.class);
+    }
+    @Test void invisibleOwnerFailsClosedAndSafeDiagnosticSurvivesWrapping() throws Exception {
+        var connection=connection(Map.of(),false);
+        var empty=mock(ResultSet.class);
+        when(connection.createStatement().executeQuery(anyString())).thenReturn(empty);
+        var source=mock(DataSource.class);when(source.getConnection()).thenReturn(connection);
+        try { MigrationRunner.guarded(source,Target.AuthTest,true).getConnection(); fail("Invisible owner accepted"); }
+        catch(java.sql.SQLException error) {
+            assertThat(MigrationRunner.failure("Ejecucion",error)).contains("\"Category\":\"IDENTIDAD\"");
+            assertThat((Throwable)error).hasNoCause();
+        }
+        verify(connection).close();
+    }
+    @Test void serverPrivilegeCheckUsesDocumentedServerScope() throws Exception {
+        var connection = connection(Map.of(), false);
+        MigrationIdentity.verify(connection, Target.AuthTest);
+        var queries = org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(connection.createStatement(), times(2)).executeQuery(queries.capture());
+        assertThat(queries.getAllValues().getFirst())
+                .contains("HAS_PERMS_BY_NAME(NULL,NULL,'CONTROL SERVER')")
+                .doesNotContain("HAS_PERMS_BY_NAME(NULL,'SERVER'");
+    }
+    @Test void transactionGuardMeasuresEntryBeforeCatalogStatement() throws Exception {
+        var connection=connection(Map.of(),false,false,true);
+        MigrationIdentity.verify(connection,Target.AuthTest,true);
+        var queries=org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(connection.createStatement(),times(2)).executeQuery(queries.capture());
+        String sql=queries.getAllValues().getFirst();
+        assertThat(sql).startsWith("DECLARE @EntryTranCount int = @@TRANCOUNT;")
+                .contains("DECLARE @EntryXactState int = XACT_STATE();",
+                        "@EntryTranCount, @EntryXactState, IS_SRVROLEMEMBER")
+                .doesNotContain("@@TRANCOUNT, XACT_STATE(), IS_SRVROLEMEMBER");
+        assertThat(sql.indexOf("DECLARE @EntryXactState")).isLessThan(sql.indexOf("FROM sys.database_principals"));
+    }
     @ParameterizedTest @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21})
     void identitySidOwnerTransactionAndPrivilegeDriftRejected(int column) throws Exception {
         Object value = switch (column) {
@@ -202,27 +254,32 @@ class MigrationRunnerTest {
         return connection(changes, extraAcl, false);
     }
     private Connection connection(Map<Integer, Object> changes, boolean extraAcl, boolean unknown) throws Exception {
+        return connection(changes,extraAcl,unknown,false);
+    }
+    private Connection connection(Map<Integer, Object> changes, boolean extraAcl, boolean unknown, boolean ownerAcl) throws Exception {
         var identity = mock(ResultSet.class);
         when(identity.wasNull()).thenReturn(unknown);
         Object[] values = {null, "ferrestock_auth_test", LOGIN, LOGIN, LOGIN, "S", 1, "auth", 1,
-                "auth_owner", "S", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                "auth_owner", "S", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5};
         changes.forEach((column, value) -> values[column] = value);
         when(identity.next()).thenReturn(true, false);
         when(identity.getString(anyInt())).thenAnswer(call -> (String) values[call.getArgument(0, Integer.class)]);
         when(identity.getInt(anyInt())).thenAnswer(call -> (Integer) values[call.getArgument(0, Integer.class)]);
-        String[] grants = {"CONNECT", "CREATE TABLE", "ALTER", "REFERENCES", "SELECT", "INSERT", "UPDATE", "DELETE", "VIEW DEFINITION"};
+        String[] grants = ownerAcl
+                ? new String[]{"CONNECT","CREATE TABLE","ALTER","REFERENCES","SELECT","INSERT","UPDATE","DELETE","VIEW DEFINITION","VIEW DEFINITION"}
+                : new String[]{"CONNECT", "CREATE TABLE", "ALTER", "REFERENCES", "SELECT", "INSERT", "UPDATE", "DELETE", "VIEW DEFINITION"};
         var index = new java.util.concurrent.atomic.AtomicInteger(-1);
         var permissions = mock(ResultSet.class);
         when(permissions.next()).thenAnswer(call -> index.incrementAndGet() < grants.length);
         when(permissions.getInt(anyInt())).thenAnswer(call -> switch (call.getArgument(0, Integer.class)) {
-            case 1 -> index.get() < 2 ? 0 : 3;
+            case 1 -> index.get() < 2 ? 0 : index.get() < 9 ? 3 : 4;
             case 2 -> index.get() < 2 ? 0 : 5;
             default -> 0;
         });
         when(permissions.getString(anyInt())).thenAnswer(call -> switch (call.getArgument(0, Integer.class)) {
             case 4 -> extraAcl && index.get() == 8 ? "CONTROL" : grants[index.get()];
             case 5 -> "G";
-            default -> index.get() < 2 ? "" : "auth";
+            default -> index.get() < 2 ? "" : index.get() < 9 ? "auth" : "auth_owner";
         });
         var statement = mock(Statement.class);
         when(statement.executeQuery(anyString())).thenReturn(identity, permissions);
