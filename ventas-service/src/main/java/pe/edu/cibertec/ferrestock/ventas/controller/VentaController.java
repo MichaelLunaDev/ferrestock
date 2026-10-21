@@ -36,8 +36,4 @@ public class VentaController {
         return ventaService.obtener(id);
     }
 
-    @GetMapping("/productos")
-    public List<Producto> listarProductos() {
-        return productoRepository.findAll();
-    }
 }
