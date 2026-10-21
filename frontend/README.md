@@ -24,7 +24,7 @@ npm.cmd run test:browser
 ```
 
 Las pruebas de navegador interceptan la API exclusivamente en `e2e/`, sin SQL.
-Sus evidencias permanecen en `auth-reportes-service/target/`. `dist/` y
+Sus capturas y resultados permanecen en `frontend/test-results/` (ignorados por Git). `dist/` y
 `node_modules/` están ignorados. `preview` sirve archivos estáticos; producción
 necesita un proxy `/api` y HTTPS revisados.
 
@@ -33,5 +33,4 @@ La sesión mantiene el token solo en memoria. Las futuras pantallas deben usar
 el contexto de sesión y cliente HTTP existentes y exigir autorización también
 en sus respectivos backends.
 
-La documentación técnica ampliada de contratos y pantallas está disponible
-internamente para el equipo y no forma parte de esta publicación pública.
+La revisión de interfaz está documentada en [UX-01](docs/FRONTEND-UX-01-REPORT.md) y [UX-02 y cierre 02A](docs/FRONTEND-UX-02-REPORT.md). Las evidencias operativas privadas del backend no forman parte de estos informes.

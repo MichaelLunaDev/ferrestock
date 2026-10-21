@@ -22,13 +22,13 @@ test('panel completo con API interceptada, sin SQL', async ({ page }, testInfo) 
  });
  await page.goto('/');
  await expect(page.getByRole('heading', { name: 'Inicia sesión' })).toBeVisible();
- await page.screenshot({ path: resolve(`../auth-reportes-service/target/fullstack01-login-${testInfo.project.name}.png`), fullPage: true });
+ await page.screenshot({ path: resolve(`test-results/${process.env.UX_PHASE || "after"}-login-${testInfo.project.name}.png`), fullPage: true });
  await page.getByLabel('Usuario', { exact: true }).fill('elena.prueba'); await page.getByLabel('Contraseña', { exact: true }).fill('fixture-password');
  await page.getByRole('button', { name: 'Ingresar al panel' }).click(); await expect(page.getByRole('heading', { name: 'Hola, Elena.' })).toBeVisible();
- await page.screenshot({ path: resolve(`../auth-reportes-service/target/fullstack01-dashboard-${testInfo.project.name}.png`), fullPage: true });
+ await page.screenshot({ path: resolve(`test-results/${process.env.UX_PHASE || "after"}-dashboard-${testInfo.project.name}.png`), fullPage: true });
  async function navigate(name: string) { if (testInfo.project.name === 'mobile') await page.getByRole('button', { name: 'Abrir navegación' }).click(); await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name, exact: true }).click(); }
  await navigate('Usuarios'); await expect(page.getByRole('link', { name: 'Administrar a Elena Prueba' })).toBeVisible();
- await page.screenshot({ path: resolve(`../auth-reportes-service/target/fullstack01-users-${testInfo.project.name}.png`), fullPage: true });
+ await page.screenshot({ path: resolve(`test-results/${process.env.UX_PHASE || "after"}-users-${testInfo.project.name}.png`), fullPage: true });
  await page.getByRole('link', { name: 'Crear usuario' }).click();
  await page.getByLabel('Nombre y apellidos').fill('Nuevo Prueba'); await page.getByLabel('Usuario', { exact: true }).fill('nuevo.prueba');
  await page.getByLabel('Contraseña inicial').fill('fixture-password'); await page.getByLabel('Repetir contraseña').fill('fixture-password');
@@ -40,11 +40,11 @@ test('panel completo con API interceptada, sin SQL', async ({ page }, testInfo) 
  await navigate('Reportes');
  for (const name of ['Ventas por período', 'Productos más vendidos', 'Stock bajo']) {
   await page.getByRole('tab', { name, exact: true }).click(); await page.getByRole('button', { name: 'Consultar reporte' }).click();
-  await expect(page.getByRole('alert')).toContainText('Los reportes comerciales todavía no están disponibles');
+  await expect(page.getByRole('alert')).toContainText('Los reportes comerciales estarán disponibles');
  }
- await page.getByRole('button', { name: /PDF/ }).click(); await expect(page.getByRole('alert')).toContainText('todavía no están disponibles');
- await page.getByRole('button', { name: /Excel/ }).click(); await expect(page.getByRole('alert')).toContainText('todavía no están disponibles');
- await page.screenshot({ path: resolve(`../auth-reportes-service/target/fullstack01-report-unavailable-${testInfo.project.name}.png`), fullPage: true });
+ await expect(page.getByRole('button', { name: /PDF/ })).toBeDisabled();
+ await expect(page.getByRole('button', { name: /Excel/ })).toBeDisabled();
+ await page.screenshot({ path: resolve(`test-results/${process.env.UX_PHASE || "after"}-report-unavailable-${testInfo.project.name}.png`), fullPage: true });
  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
  await page.goto('/#/usuarios/1'); await page.getByLabel('Operación').selectOption('rol'); await page.getByLabel('Nuevo rol').selectOption('VENDEDOR');
  await page.getByRole('button', { name: 'Guardar cambios' }).click(); await page.getByRole('button', { name: 'Confirmar cambio' }).click();
