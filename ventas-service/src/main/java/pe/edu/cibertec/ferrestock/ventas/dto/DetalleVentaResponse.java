@@ -8,7 +8,6 @@ public record DetalleVentaResponse(
         Long id,
         Long productoId,
         String productoNombre,
-        String sku,
         Integer cantidad,
         BigDecimal precioUnitario,
         BigDecimal subtotal
@@ -18,7 +17,6 @@ public record DetalleVentaResponse(
                 d.getId(),
                 d.getProducto().getId(),
                 d.getProducto().getNombre(),
-                d.getProducto().getSku(),
                 d.getCantidad(),
                 d.getPrecioUnitario(),
                 d.getSubtotal());

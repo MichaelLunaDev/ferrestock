@@ -9,7 +9,7 @@ spring:
   datasource:
     # Credenciales por variables de entorno: DB_URL, DB_USER, DB_PASSWORD.
     # Los defaults son solo para desarrollo local; la contraseña NO tiene default (definir DB_PASSWORD).
-    url: ${DB_URL:jdbc:sqlserver://localhost:1433;databaseName=ferrestock_ventas;encrypt=true;trustServerCertificate=true}
+    url: ${DB_URL:jdbc:sqlserver://localhost:14333;databaseName=ferrestock_ventas;encrypt=true;trustServerCertificate=true}
     username: ${DB_USER:sa}
     password: ${DB_PASSWORD:}
 
