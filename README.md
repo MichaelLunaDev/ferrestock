@@ -1,4 +1,4 @@
-﻿# FerreStock — Sistema de Gestión para Ferreterías
+﻿# FerreStock - Sistema de Gestión para Ferreterías
 
 Proyecto **EFSRT — Cibertec**. FerreStock busca reemplazar cuadernos y hojas de cálculo por una gestión organizada de inventario, ventas y accesos del equipo. El objetivo es reducir quiebres de stock, registrar ventas con descuento transaccional y ofrecer información comercial y consultas de catálogo.
 
@@ -241,19 +241,6 @@ npm.cmd run test:browser
 
 En un entorno con fallos al iniciar workers de Vitest se comprobó la misma suite completa con `npm.cmd test -- --maxWorkers=1`. Playwright necesita Chromium instalado; si el entorno carece de sus binarios, preparar desde `frontend/` con `npx.cmd playwright install chromium`. La suite inicia su propio Vite en 5189, sin reutilizar el de 5173, y guarda capturas/resultados ignorados en `frontend/test-results/`.
 
-| Evidencia anterior a DOCS-01 | Resultado y límite |
-| --- | --- |
-| Backend publicable, consolidación CIERRE-09 | 309 pruebas PASS; verify exitoso en copia aislada para evitar bloqueo de JAR en Windows |
-| Runner publicable | 66 pruebas PASS; las 88 históricas de otra construcción incluyen 22 pruebas TLS locales fuera del paquete público |
-| Frontend UX-02A | 59 Vitest y 13 Playwright PASS; typecheck/build PASS |
-| Auth SQL real anterior | Seis AuthSqlIT PASS sobre AuthTest; requieren autorización de fixtures, no repetir por rutina |
-| Auth real anterior al rediseño | 43 comprobaciones HTTP/navegador PASS; dos cuentas de prueba quedaron inactivas |
-| SQL local anteriormente aceptado | AuthTest/AuthDev migrados, primer administrador existente y 59 ACL exactas verificadas; no es un inventario SQL nuevo |
-
-Playwright frontend usa API aislada de prueba: no demuestra conectividad SQL ni integración comercial. Los fixtures no se importan en el bundle productivo. Los informes públicos [UX-01](frontend/docs/FRONTEND-UX-01-REPORT.md) y [UX-02/cierre 02A](frontend/docs/FRONTEND-UX-02-REPORT.md) detallan alcance, resultados y limitaciones; las evidencias administrativas privadas permanecen fuera de Git.
-
-**Comprobación ejecutada en DOCS-01:** únicamente `Start-Local.ps1 -Check`: BackendHealth y FrontendProxy true, ReadOnly true, SqlOperations 0. No se repitieron Maven, tests frontend o integración real para editar documentación, ni se iniciaron/detuvieron servicios.
-
 ## Ventas y habilitación de reportes
 
 ### Código y API existentes
@@ -300,69 +287,3 @@ Ejemplo de contrato conservado; **no ejecutarlo como prueba de onboarding sobre 
 ```
 
 Un rechazo por stock usa el estado 409, título «Venta rechazada» y detalle de faltantes. No se garantizan los IDs de ejemplo en otra base. DataSeeder contiene diez productos y, si corresponde, tres clientes; Arena gruesa tiene stock inicial 3 y Rodillo stock 2. Esas son **fixtures definidas en código**, no un inventario actual ni datos que Auth necesite crear.
-
-### Referencia histórica de arranque de Ventas
-
-El flujo anterior del README copiaba `.env.example` a `.env` y usaba `mvnw.cmd spring-boot:run` dentro de Ventas, normalmente en 8080; la selección `mvnw.cmd test -Dtest=VentaServiceTest` corresponde a su prueba unitaria. Se conserva esta referencia para su responsable, **sin recomendar su ejecución contra el SQL compartido actual**.
-
-La configuración inspeccionada tiene `ddl-auto: update`, DataSeeder sin perfil de exclusión y valores predeterminados de identidad administrativa y confianza TLS relajada. Arrancar puede crear/alterar tablas e insertar fixtures. No se encontró una estrategia versionada de migraciones de Ventas en sus recursos. El propietario debe aprobar el mecanismo de creación de esquema, credenciales de mínimo privilegio y TLS antes de integrar; no reutilizar esas configuraciones como guía de Auth.
-
-Los comandos antiguos de creación de contenedor/base con contraseña en argumentos se retiran del arranque recomendado: pertenecían a una instalación inicial que requiere revisión independiente. No borrar contenedor/volumen, cambiar contraseñas, regenerar certificados, desactivar cifrado o relajar validación TLS para resolver incidencias de onboarding.
-
-### Lo que falta para habilitar Reportes
-
-1. El propietario de Ventas confirma esquema, tablas y relaciones desplegados; la última evidencia comercial disponible registraba tablas ausentes, no una lectura nueva en DOCS-01.
-2. Aprobar el contrato de ventas, detalle y productos: estados/anulaciones, importes, fechas, ranking y umbral de stock.
-3. Ejecutar la inspección COM-READ-03 de solo lectura sobre el esquema aprobado y verificar el contrato.
-4. Aprobar permisos SELECT mínimos por objetos/columnas o vistas para el lector comercial, sin DML/DDL ni acceso global por esquema.
-5. Integrar y validar ventas por período, productos más vendidos y stock bajo con datos autorizados, incluidos JSON/PDF/XLSX.
-
-Mientras falte esa habilitación, se conserva `503 / CONTRATO_COMERCIAL_PENDIENTE`. **No significa ausencia de ventas o productos.** La interfaz presenta un único aviso y no habilita exportaciones hasta recibir una consulta válida con registros. El frontend todavía no consume operaciones de Ventas.
-
-## Solución de problemas
-
-| Síntoma o código real | Qué comprobar |
-| --- | --- |
-| Java/Node no disponible o incompatible | `java -version`, `node --version`, JDK 21 y Node >=22.12.0 en PATH |
-| SQL no accesible | Estado del contenedor y TCP 14333; coordinar con su responsable, sin recrearlo |
-| `BUILD_AND_CLASSPATH_REQUIRED` | Preparar clases y `target/local-runtime-classpath.txt` con los dos comandos Maven indicados |
-| `FRONTEND_NPM_CI_REQUIRED` | Ejecutar `npm.cmd ci` dentro de frontend cuando falten dependencias |
-| `PORT_8081_IN_USE_BY_UNVERIFIED_SERVICE` / `PORT_5173_IN_USE_BY_UNVERIFIED_SERVICE` | Identificar el servicio que ocupa el puerto; el helper no lo mata |
-| `EXTERNAL_EXISTING_JKS_REQUIRED` | Ruta absoluta a un archivo autorizado fuera del repositorio; no crear otro almacén por conjetura |
-| `CREDENTIAL_REQUIRED` | La entrada segura no puede estar vacía; confirmar con el responsable cuál contraseña corresponde |
-| `AMBIENT_JAVA_OVERRIDE_REJECTED` | Revisar JAVA_TOOL_OPTIONS, _JAVA_OPTIONS o JDK_JAVA_OPTIONS heredadas antes de iniciar |
-| `BACKEND_HEALTH_NOT_READY` / `FRONTEND_PROXY_NOT_READY` | Comprobar precondiciones, endpoint directo y proxy; solicitar diagnóstico sanitizado si persiste |
-| `LOCAL_START_REJECTED` | Fallo sanitizado no clasificado por el helper; revisión acotada, sin imprimir secretos o mensajes desconocidos del driver |
-| Login rechazado | Verificar la credencial de aplicación y el estado de la cuenta con el administrador; no confundirla con SQL/JKS ni repetir bootstrap |
-| Reportes 503 | Coordinar esquema y contrato con Ventas; no desactivar controles ni interpretar como cero ventas |
-
-No utilizar sa para las aplicaciones ni proponer omitir TLS como reparación. Un health 200 no reemplaza la revisión del problema de autenticación.
-
-## Roadmap y documentación
-
-Completado en desarrollo local:
-
-- [x] Backend Auth, roles, usuarios y sesiones opacas.
-- [x] Migraciones AuthTest/AuthDev, políticas SQL y primer administrador, mediante operaciones autorizadas separadas.
-- [x] Frontend React responsive y rediseño UX/UI, publicado junto a Auth en la rama feature.
-- [x] Registro transaccional de ventas implementado en código con pruebas unitarias.
-
-Pendiente de completar/validar conjuntamente:
-
-- [ ] Esquema comercial de Ventas desplegado con procedimiento aprobado y contrato revisado.
-- [ ] Integración de los tres reportes y exportaciones JSON/PDF/XLSX con datos comerciales reales.
-- [ ] Anulación de ventas con devolución de stock e inventario de entradas/salidas.
-- [ ] Gestión completa de clientes e integración comercial en el frontend compartido.
-- [ ] Catálogo y chatbot Watson Assistant.
-- [ ] Filtros globales de usuarios y revisión manual de accesibilidad/teclado móvil.
-- [ ] Revisión de producción y despliegue Azure.
-
-Referencias verificadas: [Frontend](frontend/README.md), [lanzador local](auth-reportes-service/tools/local-runtime/Start-Local.ps1), [POM Auth](auth-reportes-service/pom.xml), [POM Ventas](ventas-service/pom.xml), [runner](auth-reportes-service/tools/db-runner/README.md), [migraciones Auth](auth-reportes-service/src/main/resources/db/migration/).
-
-El [README de Auth](auth-reportes-service/README.md) conserva descripciones históricas y un estado de integración anterior; para el arranque local aceptado prevalecen los pasos de esta guía. El README del runner explica operaciones independientes, algunas sujetas a aprobación; no ejecutar sus ejemplos de migración como parte del inicio cotidiano. El manifiesto de planificación no constituye una aprobación administrativa retroactiva.
-
-La rama de desarrollo es `feature/auth-reportes-service`; Auth y frontend se publicaron hasta `b8b9b221c9143fcfc1430e2f9d07d173e1541d97`. Esta actualización documental queda pendiente de revisión, sin commit/push en DOCS-01.
-
----
-
-Hecho con ☕ y 🔩
