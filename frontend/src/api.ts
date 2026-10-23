@@ -1,5 +1,5 @@
 import { parse, stringify, LosslessNumber } from 'lossless-json';
-import type { LoginResult, Report, ReportFormat, ReportQuery, Role, User } from './types';
+import type { Categoria, Cliente, DetalleVenta, ItemVenta, LoginResult, Producto, Report, ReportFormat, ReportQuery, Role, User, Venta } from './types';
 
 const messages: Record<string, string> = {
  CONTRATO_COMERCIAL_PENDIENTE: 'Los reportes comerciales todavía no están disponibles. Inténtalo cuando el servicio esté habilitado.',
@@ -8,6 +8,7 @@ const messages: Record<string, string> = {
  REPORTE_DEMASIADO_GRANDE: 'El reporte supera las 5 000 filas. Reduce el período o el umbral.',
  OPERACION_EN_CURSO: 'Esta operación ya está en curso. Espera a que termine.',
  RESPUESTA_INVALIDA: 'No se pudo verificar la respuesta del servicio.',
+ STOCK_INSUFICIENTE: 'No hay stock suficiente para completar la venta. No se realizó ningún cambio.',
 };
 export class ApiError extends Error {
  constructor(public status: number, public code: string, public retryAfter?: number) {
@@ -26,6 +27,30 @@ export function isUser(value: unknown): value is User {
   && ['ACTIVO', 'INACTIVO'].includes(value.estado as string) && validId(value.id as string) && validId(value.versionSeguridad as string);
 }
 export function validId(value: string) { return /^\d{1,19}$/.test(value) && BigInt(value) > 0n && BigInt(value) <= 9223372036854775807n; }
+export function isCategoria(value: unknown): value is Categoria {
+ if (!record(value)) return false;
+ return typeof value.id === 'string' && validId(value.id) && typeof value.nombre === 'string' && (value.descripcion === null || typeof value.descripcion === 'string');
+}
+export function isCliente(value: unknown): value is Cliente {
+ if (!record(value)) return false;
+ return ['id', 'nombre', 'documento', 'tipoDocumento'].every(k => typeof value[k] === 'string') && validId(value.id as string);
+}
+export function isProducto(value: unknown): value is Producto {
+ if (!record(value)) return false;
+ return typeof value.id === 'string' && validId(value.id) && typeof value.nombre === 'string'
+  && (value.descripcion === null || typeof value.descripcion === 'string')
+  && ['precio', 'stock', 'stockMinimo', 'categoriaId'].every(k => typeof value[k] === 'string');
+}
+function isDetalleVenta(value: unknown): value is DetalleVenta {
+ if (!record(value)) return false;
+ return ['id', 'productoId', 'productoNombre', 'cantidad', 'precioUnitario', 'subtotal'].every(k => typeof value[k] === 'string');
+}
+export function isVenta(value: unknown): value is Venta {
+ if (!record(value)) return false;
+ return ['id', 'fecha', 'clienteId', 'clienteNombre', 'clienteDocumento', 'vendedor', 'total'].every(k => typeof value[k] === 'string')
+  && ['COMPLETADA', 'ANULADA'].includes(value.estado as string)
+  && (value.detalles === null || (Array.isArray(value.detalles) && value.detalles.every(isDetalleVenta)));
+}
 export function decode(text: string): unknown { return parse(text, undefined, (value: string) => value); }
 export function validateReport(query: ReportQuery): string | null {
  if (query.kind === 'stock-bajo') return /^\d+$/.test(query.umbral) && Number(query.umbral) <= 1000000 ? null : 'El umbral debe estar entre 0 y 1 000 000.';
@@ -123,6 +148,47 @@ export class ApiClient {
      : validId(row.productoId as string) && (query.kind === 'productos-mas-vendidos' ? /^-?\d+$/.test(row.unidades as string) && /^-?\d+(\.\d+)?$/.test(row.importe as string) : /^-?\d+$/.test(row.stock as string)));
   }) || (query.kind === 'productos-mas-vendidos' && result.filas.length > Number(query.top))) throw new ApiError(503, 'RESPUESTA_INVALIDA');
   return result as unknown as Report;
+ }
+ async productos(): Promise<Producto[]> {
+  const result = await this.request('/productos');
+  if (!Array.isArray(result) || !result.every(isProducto)) throw new ApiError(503, 'RESPUESTA_INVALIDA');
+  return result;
+ }
+ async categorias(): Promise<Categoria[]> {
+  const result = await this.request('/categorias');
+  if (!Array.isArray(result) || !result.every(isCategoria)) throw new ApiError(503, 'RESPUESTA_INVALIDA');
+  return result;
+ }
+ async clientes(): Promise<Cliente[]> {
+  const result = await this.request('/clientes');
+  if (!Array.isArray(result) || !result.every(isCliente)) throw new ApiError(503, 'RESPUESTA_INVALIDA');
+  return result;
+ }
+ async crearCliente(input: { nombre: string; documento: string; tipoDocumento: string }): Promise<Cliente> {
+  const result = await this.request('/clientes', { method: 'POST', body: input });
+  if (!isCliente(result)) throw new ApiError(503, 'RESPUESTA_INVALIDA');
+  return result;
+ }
+ async crearProducto(input: { nombre: string; descripcion: string; precio: string; stock: string; stockMinimo: string; categoriaId: string }): Promise<Producto> {
+  const result = await this.request('/productos', { method: 'POST', body: input });
+  if (!isProducto(result)) throw new ApiError(503, 'RESPUESTA_INVALIDA');
+  return result;
+ }
+ async ventas(): Promise<Venta[]> {
+  const result = await this.request('/ventas');
+  if (!Array.isArray(result) || !result.every(isVenta)) throw new ApiError(503, 'RESPUESTA_INVALIDA');
+  return result;
+ }
+ async venta(id: string): Promise<Venta> {
+  if (!validId(id)) throw new ApiError(404, '');
+  const result = await this.request(`/ventas/${id}`);
+  if (!isVenta(result) || result.id !== id) throw new ApiError(503, 'RESPUESTA_INVALIDA');
+  return result;
+ }
+ async registrarVenta(input: { clienteId: string; vendedor: string; items: ItemVenta[] }): Promise<Venta> {
+  const result = await this.request('/ventas', { method: 'POST', body: input });
+  if (!isVenta(result)) throw new ApiError(503, 'RESPUESTA_INVALIDA');
+  return result;
  }
  async download(query: ReportQuery, format: 'PDF' | 'XLSX'): Promise<Blob> {
   if (validateReport(query)) throw new ApiError(400, '');

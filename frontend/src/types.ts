@@ -10,3 +10,9 @@ export type ReportKind = 'ventas' | 'productos-mas-vendidos' | 'stock-bajo';
 export type ReportFormat = 'JSON' | 'PDF' | 'XLSX';
 export interface ReportQuery { kind: ReportKind; desde: string; hasta: string; top: string; umbral: string }
 export interface Report { filas: Array<Sale | TopProduct | Stock> }
+export interface Categoria { id: string; nombre: string; descripcion: string | null }
+export interface Cliente { id: string; nombre: string; documento: string; tipoDocumento: string }
+export interface Producto { id: string; nombre: string; descripcion: string | null; precio: string; stock: string; stockMinimo: string; categoriaId: string }
+export interface ItemVenta { productoId: string; cantidad: string }
+export interface DetalleVenta { id: string; productoId: string; productoNombre: string; cantidad: string; precioUnitario: string; subtotal: string }
+export interface Venta { id: string; fecha: string; clienteId: string; clienteNombre: string; clienteDocumento: string; vendedor: string; total: string; estado: 'COMPLETADA' | 'ANULADA'; detalles: DetalleVenta[] | null }

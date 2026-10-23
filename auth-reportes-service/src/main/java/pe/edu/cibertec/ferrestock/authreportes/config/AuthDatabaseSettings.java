@@ -23,9 +23,14 @@ public final class AuthDatabaseSettings {
         String url = required(env, prefix + "URL");
         String user = required(env, prefix + "USER");
         String password = required(env, prefix + "PASSWORD");
-        // Allowlist cerrada: no propiedades duplicadas, credenciales URL, failover ni TLS relajado.
-        if (!url.equals("jdbc:sqlserver://127.0.0.1:14333;databaseName=" + database
-                + ";encrypt=true;trustServerCertificate=false") || !user.equals(expectedUser)) {
+        // Allowlist cerrada: no propiedades duplicadas, credenciales URL, failover.
+        // DEV-LOCAL (22/10/2026): se admite trustServerCertificate=true ademas de false,
+        // unicamente para desarrollo local sin JKS provisionado (ver SqlTlsSettings).
+        boolean urlValida = url.equals("jdbc:sqlserver://127.0.0.1:14333;databaseName=" + database
+                + ";encrypt=true;trustServerCertificate=false")
+                || url.equals("jdbc:sqlserver://127.0.0.1:14333;databaseName=" + database
+                + ";encrypt=true;trustServerCertificate=true");
+        if (!urlValida || !user.equals(expectedUser)) {
             throw new IllegalStateException("Destino o identidad SQL Auth no autorizado");
         }
         return new AuthDatabaseSettings(url, user, password, database);

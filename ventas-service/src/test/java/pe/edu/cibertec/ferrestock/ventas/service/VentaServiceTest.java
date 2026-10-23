@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pe.edu.cibertec.ferrestock.ventas.dto.ItemVentaRequest;
 import pe.edu.cibertec.ferrestock.ventas.dto.VentaRequest;
 import pe.edu.cibertec.ferrestock.ventas.dto.VentaResponse;
+import pe.edu.cibertec.ferrestock.ventas.entity.Categoria;
 import pe.edu.cibertec.ferrestock.ventas.entity.Cliente;
 import pe.edu.cibertec.ferrestock.ventas.entity.EstadoVenta;
 import pe.edu.cibertec.ferrestock.ventas.entity.Producto;
@@ -48,8 +49,10 @@ class VentaServiceTest {
 
     @BeforeEach
     void setUp() {
-        martillo = new Producto(1L, "Martillo", null, "HER-MAR-16", new BigDecimal("34.50"), 40, "Herramientas");
-        rodillo = new Producto(2L, "Rodillo", null, "PIN-ROD-9", new BigDecimal("22.50"), 2, "Pinturas");
+        Categoria herramientas = Categoria.builder().id(1L).nombre("Herramientas").build();
+        Categoria pinturas = Categoria.builder().id(2L).nombre("Pinturas").build();
+        martillo = new Producto(1L, "Martillo", null, new BigDecimal("34.50"), 40, 5, herramientas, java.time.LocalDateTime.now());
+        rodillo = new Producto(2L, "Rodillo", null, new BigDecimal("22.50"), 2, 5, pinturas, java.time.LocalDateTime.now());
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(new Cliente(1L, "Juan", "45879632", "DNI")));
         when(productoRepository.findAllByIdForUpdate(anyCollection())).thenReturn(List.of(martillo, rodillo));
     }
