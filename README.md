@@ -13,8 +13,6 @@ Proyecto **EFSRT — Cibertec**. FerreStock busca reemplazar cuadernos y hojas d
 - [Acceso y comprobaciones](#acceso-y-comprobaciones)
 - [Pruebas y evidencias](#pruebas-y-evidencias)
 - [Ventas y habilitación de reportes](#ventas-y-habilitación-de-reportes)
-- [Solución de problemas](#solución-de-problemas)
-- [Roadmap y documentación](#roadmap-y-documentación)
 
 ## Estado funcional y roles
 
