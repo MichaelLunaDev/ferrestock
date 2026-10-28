@@ -285,3 +285,5 @@ Ejemplo de contrato conservado; **no ejecutarlo como prueba de onboarding sobre 
 ```
 
 Un rechazo por stock usa el estado 409, título «Venta rechazada» y detalle de faltantes. No se garantizan los IDs de ejemplo en otra base. DataSeeder contiene diez productos y, si corresponde, tres clientes; Arena gruesa tiene stock inicial 3 y Rodillo stock 2. Esas son **fixtures definidas en código**, no un inventario actual ni datos que Auth necesite crear.
+
+PROYECTO FINALIZADO
